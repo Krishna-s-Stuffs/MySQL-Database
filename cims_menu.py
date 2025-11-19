@@ -4,6 +4,8 @@ import mysql.connector as sql
 mycon = sql.connect(host='localhost', user='', passwd='', database='cims')
 if mycon.is_connected():
     print("Successfully Connected")
+else:
+    print("Error Connecting. Kindly enter correct credentials.")
 
 cursor = mycon.cursor()
 
@@ -20,14 +22,34 @@ if choice == 1:
     admno = int(input("\nEnter the Admission Number: "))
     candidatename = input("Enter your name : ")
     print("\nAvailable Courses:")
-    print("1. JAVA\n2. PYTHON\n3. C\n4. BASIC\n5. HTML\n")
+    print("1. JAVA    (Course Fee: 450000)")
+    print("2. PYTHON  (Course Fee: 420000)")
+    print("3. C       (Course Fee: 400000)")
+    print("4. BASIC   (Course Fee: 350000)")
+    print("5. HTML    (Course Fee: 410000)\n")
     course = input("Enter the Course Name: ").upper()
-    SQL_Insert = "INSERT INTO candidate_details (adm_no, candidate_name, course) VALUES (%s, %s, %s)"
-    values = (admno, candidatename, course)
-    cursor.execute(SQL_Insert, values)
-    mycon.commit()
-    print(f"\nYou are Enrolled Mr. {candidatename}. Congrats!!!")
-    print(f"Your enrollment for {course} course is successful!\n")
+    amount = int(input("Enter the Couse Fee Amount you'll pay: "))
+    amt = ''
+    if course == "JAVA":
+        amt = 450000
+    elif course == "PYTHON":
+        amt = 420000
+    elif course == "C":
+        amt = 400000
+    elif course == "BASIC":
+        amt = 350000
+    elif course == "HTML":
+        amt = 410000
+    if amount < int(amt) :
+        print(f"\nYou are required to pay more {amt - amount}")
+        print("Cancelling Enrollment.\n")
+    elif amount >= int(amt):
+        SQL_Insert = "INSERT INTO candidate_details (adm_no, candidate_name, course) VALUES (%s, %s, %s)"
+        values = (admno, candidatename, course)
+        cursor.execute(SQL_Insert, values)
+        mycon.commit()
+        print(f"\nYou are Enrolled Mr. {candidatename}. Congrats!!!")
+        print(f"Your enrollment for {course} course is successful!\n")
 
 elif choice == 2:
     # Edit Enrollments (as admin)
@@ -69,13 +91,26 @@ elif choice == 2:
 
 elif choice == 3:
     # Display Entries
-    cursor.execute("SELECT * FROM candidate_details")
-    data = cursor.fetchall()
-    print("\n======= Candidates Details =====\n")
-    for row in data:
-        print("  Admission Number : ", row[0])
-        print("  Candidate Name   : ", row[1])
-        print("  Course Selected  : ", row[2], "\n")
+    print ("1. All student details.")
+    print ("2. Specific Student (Adm. No.)")
+    choice = int(input("Enter the choice(1-2): "))
+    if choice == 1:
+        cursor.execute("SELECT * FROM candidate_details")
+        data = cursor.fetchall()
+        print("\n==== All Candidates Details ====\n")
+        for row in data:
+            print("  Admission Number : ", row[0])
+            print("  Candidate Name   : ", row[1])
+            print("  Course Selected  : ", row[2], "\n")
+    elif choice == 2:
+        admno = int(input("Enter the admission number: "))
+        cursor.execute("SELECT * FROM candidate_details WHERE adm_no = %s", (admno,))
+        data = cursor.fetchall()
+        print("\n======= Candidates Details =====\n")
+        for row in data:
+            print("  Admission Number : ", row[0])
+            print("  Candidate Name   : ", row[1])
+            print("  Course Selected  : ", row[2], "\n")
 elif choice == 4:
     print('\nThank You :) \n')
 else:
