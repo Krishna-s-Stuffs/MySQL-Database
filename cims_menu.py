@@ -1,13 +1,14 @@
 import mysql.connector as sql
 
 # Connect to MySQL
-mycon = sql.connect(host='localhost', user='', passwd='', database='cims')
-if mycon.is_connected():
-    print("Successfully Connected")
-else:
-    print("Error Connecting. Kindly enter correct credentials.")
-
-cursor = mycon.cursor()
+try:
+    mycon = sql.connect(host='localhost', user='root', passwd='manager', database='cims')
+    if mycon.is_connected():
+        print("Successfully Connected")
+        cursor = mycon.cursor()
+except:
+    print("Wrong Credentials! Please enter correct Credentials.")
+    exit(0)
 
 print("\n===== Computer Institute Management System =====\n")
 print("1. Enrolling For A Course")
@@ -29,7 +30,8 @@ if choice == 1:
     print("5. HTML    (Course Fee: 410000)\n")
     course = input("Enter the Course Name: ").upper()
     amount = int(input("Enter the Couse Fee Amount you'll pay: "))
-    amt = ''
+
+    amt = 0
     if course == "JAVA":
         amt = 450000
     elif course == "PYTHON":
@@ -40,10 +42,10 @@ if choice == 1:
         amt = 350000
     elif course == "HTML":
         amt = 410000
-    if amount < int(amt) :
+    if amount < amt :
         print(f"\nYou are required to pay more {amt - amount}")
         print("Cancelling Enrollment.\n")
-    elif amount >= int(amt):
+    elif amount >= amt:
         SQL_Insert = "INSERT INTO candidate_details (adm_no, candidate_name, course) VALUES (%s, %s, %s)"
         values = (admno, candidatename, course)
         cursor.execute(SQL_Insert, values)
